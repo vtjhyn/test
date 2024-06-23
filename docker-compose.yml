@@ -1,0 +1,37 @@
+version: "3.9"
+services:
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@mekar-db:5432/mekar?schema=public
+    depends_on:
+      - mekar-db
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - server
+
+  mekar-db:
+    container_name: mekar-db
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=mekar
+    ports:
+      - "5432:5432"
+    volumes:
+      - mekar-pgdata:/var/lib/postgresql/data
+
+volumes:
+  mekar-pgdata: {}
